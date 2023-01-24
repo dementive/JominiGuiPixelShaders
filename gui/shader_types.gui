@@ -1,0 +1,12 @@
+types ShaderTypes
+{
+	type shader_icon = icon {
+		gfxtype = icongfx
+		shaderfile = "gfx/FX/GUI_default.shader"
+		using = tooltip_es
+	}
+	type proportional_shader_icon = icon {
+		gfxtype = propstretchedicongfx
+		shaderfile = "gfx/FX/GUI_default.shader"
+	}
+}
