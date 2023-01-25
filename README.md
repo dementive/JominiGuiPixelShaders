@@ -58,7 +58,7 @@ The full list of usable `effectname` parameters are:
 13. GuiGloom - Makes the texture look "gloomy"
 
 ## Special Shader Effects
-1. GuiDreamView - Draws a circular pattern around the texture and lightens colors around the center, looks like your dreaming.
+1. GuiDreamView - Draws a circular pattern that looks like a dream.
 2. GuiChromaticAberration - Linear chromatic abberation that shifts horizontally
 3. GuiAberration - Static chromatic abberation effect
 4. GuiShakyColor - Shakes the colors of the texture back and forth
