@@ -1,4 +1,4 @@
-# Jomini GUI Pixel Shader
+# Jomini GUI Pixel Shaders
 
 A collection of 20+ Pixel shaders meant to be used on GUI elements for Jomini based paradox games. This was made in Imperator Rome but Crusader Kings III and Victoria 3 both use the exact same default gui pixel shader so these shaders will work on all 3 of those games.
 
@@ -39,8 +39,6 @@ icon = {
 
 These shaders can be used on any gui widget that normally use the `shaderfile = "pdxgui_default.shader"`. However they can be applied to any shader but the pixel shader code and shader effects will need to be updated with that specific shaders vanilla code, which is very easy to do. If you need the effects for another shader (`pdxgui_pushbutton.shader for example`) open up an issue and i'll get to it eventually or do it yourself and put up a pull request.
 
-# Pixel Shader Effects
-
 The full list of usable `effectname` parameters are:
 
 ## PostProcessing Effects
@@ -69,26 +67,4 @@ The full list of usable `effectname` parameters are:
 7. GuiBlackHole - Black Hole with gravitational lensing that roams around a texture
 8. GuiCameraFilm - Applies a camera film filter over the texture, makes it look like an old TV screen.
 
-# License
-
-MIT License
-
-Copyright (c) 2022
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## Screenshots
