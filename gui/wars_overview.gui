@@ -104,8 +104,10 @@ widget = {
 			# Postprocessing effects (in order of usefullness)
 			#effectname = "GuiSaturate"
 			#effectname = "GuiVibrance"
+			#effectname = "GuiGloom"
 			#effectname = "GuiEdges"
 			#effectname = "GuiCrossProcessing"
+			#effectname = "GuiSharpen"
 			#effectname = "GuiCellShade"
 			#effectname = "GuiBloom"
 			#effectname = "GuiVignet"
@@ -114,25 +116,18 @@ widget = {
 			#effectname = "GuiColorGrading"
 			#effectname = "GuiPlasticWrap"
 
-			# To test
-
-			effectname = "GuiGloom"
-			effectname = "GuiColorKeyAlpha"
-
 			# Special Shader effects
 			#effectname = "GuiDreamView"
 			#effectname = "GuiChromaticAberration"
 			#effectname = "GuiAberration"
+			#effectname = "GuiCameraFilm"
+			#effectname = "GuiHueShift"
 
 			# Meme tier 
 			#effectname = "GuiShakyColor"
 			#effectname = "GuiUnderwaterBlur"
 			#effectname = "GuiKaleidoscope"
-			#effectname = "GuiBlackHole"
 
-			# These 2 are really bad need to rewrite
-			#effectname = "GuiSharpen"
-			#effectname = "GuiCameraFilm"
 			
 			position = { 0 0 }
 			texture = "gfx/loadingscreens/load_9.dds"

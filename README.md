@@ -64,7 +64,9 @@ The full list of usable `effectname` parameters are:
 4. GuiShakyColor - Shakes the colors of the texture back and forth
 5. GuiUnderwaterBlur - Heavy underwater blur effect with a lot of movement
 6. GuiKaleidoscope - Turns a texture into a Kaleidoscope
-7. GuiBlackHole - Black Hole with gravitational lensing that roams around a texture
-8. GuiCameraFilm - Applies a camera film filter over the texture, makes it look like an old TV screen.
+7. GuiCameraFilm - Applies a camera film filter over the texture, makes it look like an old TV screen.
 
 ## Screenshots
+
+
+License - Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.

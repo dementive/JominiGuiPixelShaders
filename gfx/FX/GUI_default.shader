@@ -4,6 +4,7 @@
 Includes = {
 	"cw/pdxgui.fxh"
 	"cw/pdxgui_sprite.fxh"
+	"cw/utility.fxh"
 	"standardfuncsgfx.fxh"
 }
 
@@ -61,41 +62,19 @@ PixelShader =
 		[[
 			PDX_MAIN
 			{
-				// https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/sections/posterization.md
+				// https://www.shadertoy.com/view/XlSSRW
 				// Posterization for Gui elements
 
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
-				OutColor *= Input.Color;
 
-				// Posterize Constants
-				float levels = 8.0;
-				float2 gamma = float2(2.2, 1.0 / 2.2);
-
-				// Avoid the background.
-				if (Input.Position.a <= 0) {
-					#ifdef DISABLED
-						OutColor.rgb = DisableColor( OutColor.rgb );
-						return OutColor;
-					#else
-						return OutColor;
-					#endif
-				}
-
-				float4 fragColor = PdxTex2D(Texture, Input.UV0);
-				fragColor.rgb = pow(abs(fragColor.rgb), abs(vec3(gamma.y)));
-				float greyscale = max(fragColor.r, max(fragColor.g, fragColor.b));
-
-				float lower     = floor(greyscale * levels) / levels;
-				float lowerDiff = abs(greyscale - lower);
-				float upper     = ceil(greyscale * levels) / levels;
-				float upperDiff = abs(upper - greyscale);
-
-				float level      = lowerDiff <= upperDiff ? lower : upper;
-				float adjustment = level / greyscale;
-
-				fragColor.rgb = fragColor.rgb * adjustment;
-				fragColor.rgb = pow(abs(fragColor.rgb), abs(vec3(gamma.x)));
-				OutColor = float4(fragColor.rgb, OutColor.a);
+				float nColors = 9.0;
+				float vx_offset = 0.5;
+				float2 coord = float2(0.0,0.0);
+				float cutColor = 1./nColors;
+				
+			    OutColor.rgb = RGBtoHSV( OutColor.rgb );
+			    float2 target_c = cutColor*floor(OutColor.gb/cutColor);
+			    OutColor.rgb = HSVtoRGB( float3(OutColor.r,target_c) );
 
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
@@ -111,27 +90,45 @@ PixelShader =
 		Output = "PDX_COLOR"
 		Code
 		[[
+			float extractLuma(float3 c)
+			{
+			    return c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+			}
 			PDX_MAIN
 			{
-				// https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/sections/sharpen.md
+				// www.shadertoy.com/view/4tcGW2
 				// Sharpen effect for gui elements
 
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
 
-				// Sharpen Constants
-				#define SHARPEN_AMOUNT 0.4
-				#define SHARPEN_NEIGHBOR float(SHARPEN_AMOUNT * -1.5)
-				#define SHARPEN_CENTER float(SHARPEN_AMOUNT *  4.0 + 1.0)
-				float3 color1 = PdxTex2D( Texture, (Input.UV0.xy + float2( 0.0,  1.0)) / 1.0).rgb * SHARPEN_NEIGHBOR;
-				float3 color2 = PdxTex2D( Texture, (Input.UV0.xy + float2( -1.0,  0.0)) / 1.0).rgb * SHARPEN_NEIGHBOR;
-				float3 color3 = PdxTex2D( Texture, (Input.UV0.xy + float2( 0.0,  0.0)) / 1.0).rgb * SHARPEN_CENTER;
-				float3 color4 = PdxTex2D( Texture, (Input.UV0.xy + float2( 1.0,  0.0)) / 1.0).rgb * SHARPEN_NEIGHBOR;
-				float3 color5 = PdxTex2D( Texture, (Input.UV0.xy + float2( 0.0,  -1.0)) / 1.0).rgb * SHARPEN_NEIGHBOR;
+				float3x3 YUVFromRGB = Create3x3(
+				   float3(0.299,-0.14713, 0.615),
+				   float3(0.587,-0.28886,-0.51499),
+				   float3(0.114,0.436,-0.10001));
 
-				float3 color =	color1 + color2 + color3 + color4 + color5;
-				OutColor = float4(color, OutColor.a);
+				float3x3 RGBFromYUV = Create3x3(
+				    float3(1, 1, 1),
+				    float3(0.0,-0.394,2.03211),
+				    float3(1.13983,-0.580,0.0));
 
+			    float3 yuv = mul(YUVFromRGB, OutColor.rgb);
+			    float2 size = Input.Position.x / Input.Position.y;
+			    
+			    float accumY = 0.0; 
+			    for(int i = -1; i <= 1; ++i) {
+			        for(int j = -1; j <= 1; ++j) {
+			            float2 offset = float2(i,j) / size;
+			            float s = extractLuma(PdxTex2D(Texture,Input.UV0 + offset).rgb);
+			            float notCentre = min(float(i*i + j*j),1.0);
+			            accumY += s * (9.0 - notCentre*10.0);
+			        }
+			    }
+			    
+			    accumY /= 11.0;
+			    accumY = (accumY + yuv.x)*0.9;
+			    
+				OutColor = float4(mul(RGBFromYUV, float3(accumY,yuv.y,yuv.z)),OutColor.a);
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
@@ -205,7 +202,7 @@ PixelShader =
 				float xTrans = (Input.UV0.x*2)-1;
 				float yTrans = 1-(Input.UV0.y*2);
 				
-				float angle = atan(yTrans/xTrans) + PI;
+				float angle = atan2(yTrans/xTrans) + PI;
 
 				angle += (sign(xTrans) == 1) ? PI : 0.0;
 
@@ -303,21 +300,50 @@ PixelShader =
 		Output = "PDX_COLOR"
 		Code
 		[[
+			float3 channel_mix(float3 a, float3 b, float3 w) {
+			    return float3(lerp(a.r, b.r, w.r), lerp(a.g, b.g, w.g), lerp(a.b, b.b, w.b));
+			}
+
+			float gaussian(float z, float u, float o) {
+			    return (1.0 / (o * sqrt(2.0 * 3.1415))) * exp(-(((z - u) * (z - u)) / (2.0 * (o * o))));
+			}
+
+			float3 screen(float3 a, float3 b, float w) {
+			    return lerp(a, vec3(1.0) - (vec3(1.0) - a) * (vec3(1.0) - b), w);
+			}
+
+			float3 soft_light(float3 a, float3 b, float w) {
+			    return lerp(a, pow(a, pow(vec3(2.0), 2.0 * (vec3(0.5) - b))), w);
+			}
+
 			PDX_MAIN
 			{
-				// https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/sections/film-grain.md
+				// https://www.shadertoy.com/view/4t2fRz
 				// Camera film filter effect for gui elements
-				#define PI_F2 float2(PI, radians(180.))
-				#define GRAIN_FRAME_TIME GlobalTime / 120.0
-				#define FILM_INTENSITY 10000
 
-				float amount  = 0.15;
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
+
+				#define SPEED 2.0
+				#define INTENSITY 0.075
+				#define MEAN 0.0 // What gray level noise should tend to.
+				#define VARIANCE 0.5 // Controls the contrast/variance of noise.
+
+				float t = GlobalTime / float(SPEED);
+				float seed = dot(Input.UV0, float2(12.9898, 78.233));
+				float noise = frac(sin(seed) * 43758.5453 + t);
+				noise = gaussian(noise, float(MEAN), float(VARIANCE) * float(VARIANCE));
+				float3 grain = vec3(noise) * (1.0 - OutColor.rgb);
 				
-				float randomIntensity = frac( FILM_INTENSITY * sin(( Input.UV0.x + Input.UV0.y * GRAIN_FRAME_TIME ) * PI_F2.y ));
-				amount *= randomIntensity;
-				OutColor.rgb += amount;
+				// Output options
+				// Addition
+				OutColor.rgb += grain * INTENSITY;
+				// Screen
+				//OutColor.rgb = screen(color.rgb, grain, INTENSITY);
+				// Soft Light
+				//OutColor.rgb = soft_light(color.rgb, grain, INTENSITY);
+				// Lighten-Only
+				//OutColor.rgb = max(color.rgb, grain * INTENSITY);
 
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
@@ -696,62 +722,6 @@ PixelShader =
 			}
 		]]
 	}
-	MainCode PS_GuiBlackHole
-	{	
-		Input = "VS_OUTPUT_PDX_GUI"
-		Output = "PDX_COLOR"
-		Code
-		[[
-			PDX_MAIN
-			{
-				// https://github.com/Unknown6656/WPFPixelShaderLibrary/blob/master/wpfpslib/ps-hlsl/BlackHole.fx
-				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
-				OutColor *= Input.Color;
-
-				// "Constant buffer" values
-				/// The black hole's center position
-				/// Should be set to a value between [(0,0)..(1,1)]
-				float2 position = float2(0.4, 0.5);
-				// Could maybe adjust this value over time so the black hole "moves" around the texture
-				// Will be hard to make it smooth though as it has to nicely bounce off edges
-
-				// The aspect ratio - width / height
-				float aspectratio = Input.Position.x / Input.Position.y;
-
-				/// The graviational lensing effect radius.
-				/// Should be set to a value between [0..1]
-				float radius = 0.3;
-
-				/// The black hole's distance to the 'camera'.
-				/// Should be set to a value of (0..1]
-				float dist = 0.6;
-
-				// The black hole's size compared to its graviational lensing radius.
-				// Should be set to a value of (0..1]
-				float size = 0.7;
-
-				// End cbuff vals
-
-				float irad = saturate(radius / 100);
-				float2 offs = Input.UV0 - position;
-				float2 ratio = float2(clamp(aspectratio, 0.001, 1000), 1 );
-				float rad = length(offs / ratio);
-				float4 res;
-
-			    float defm = 2 * irad / pow(rad * pow(dist, 0.5), 1.7);
-			    offs *= 1 - defm;
-			    offs += position;
-			    res =  PdxTex2D(Texture, offs);
-				res = (rad < irad * 6 * saturate(size)) ? float4(0, 0, 0, 1) : res;
-
-				OutColor = float4(res.rgb, OutColor.a);
-				#ifdef DISABLED
-					OutColor.rgb = DisableColor( OutColor.rgb );
-				#endif
-			    return OutColor;
-			}
-		]]
-	}
 	MainCode PS_GuiKaleidoscope
 	{	
 		Input = "VS_OUTPUT_PDX_GUI"
@@ -772,7 +742,7 @@ PixelShader =
 
 				float xTrans = (Input.UV0.x*2)-1;
 				float yTrans = 1-(Input.UV0.y*2);
-				float angle = atan(yTrans/xTrans)+ (PI/2);
+				float angle = atan2(yTrans/xTrans)+ (PI/2);
 				angle += (sign(xTrans) == -1) ? PI : 0.0;
 				float radius = sqrt(pow(xTrans,2) + pow(yTrans,2));	
 				float angleDegrees = degrees(angle);
@@ -984,8 +954,8 @@ PixelShader =
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
 
-				float GloomIntensity = 0.5;
-				float BaseIntensity = 0.5;
+				float GloomIntensity = 0.9;
+				float BaseIntensity = 0.75;
 				float GloomSaturation = 1.0;
 				float BaseSaturation = 1.0;
 				float threshold = 0.25f;
@@ -1064,21 +1034,28 @@ PixelShader =
 			}
 		]]
 	}
-	MainCode PS_GuiColorKeyAlpha
+	MainCode PS_GuiHueShift
 	{	
 		Input = "VS_OUTPUT_PDX_GUI"
 		Output = "PDX_COLOR"
 		Code
 		[[
+			float4 shiftHue(in float3 col, in float shift)
+			{
+				float3 P = vec3(0.55735) * dot(vec3(0.55735), col);
+				float3 U = col - P;
+				float3 V = cross(vec3(0.55735), U);    
+				col = U * cos(shift * 6.2832) + V * sin(shift * 6.2832) + P;
+				return float4(col, 1.0);
+			}
 			PDX_MAIN
 			{
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
 
-				// if( OutColor.r + OutColor.g + OutColor.b < 0.3 ) {
-				//    OutColor.rgba = 0;
-				// }
-				OutColor.rgba *= ( OutColor.r + OutColor.g + OutColor.b < 0.3 ) ? 0.0 : 1.0;
+				float hue = abs(sin(GlobalTime * 0.1));
+				float4 color = shiftHue(OutColor.rgb, hue);
+				OutColor = float4(color.rgb, OutColor.a);
 
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
@@ -1347,19 +1324,6 @@ Effect GuiUnderwaterBlurDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiBlackHole
-{
-	VertexShader = "VS_Default"
-	PixelShader = "PS_GuiBlackHole"
-}
-Effect GuiBlackHoleDisabled
-{
-	VertexShader = "VS_Default"
-	PixelShader = "PS_GuiBlackHole"
-	
-	Defines = { "DISABLED" }
-}
-
 Effect GuiKaleidoscope
 {
 	VertexShader = "VS_Default"
@@ -1438,15 +1402,15 @@ Effect GuiPlasticWrapDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiColorKeyAlpha
+Effect GuiHueShift
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_GuiColorKeyAlpha"
+	PixelShader = "PS_GuiHueShift"
 }
-Effect GuiColorKeyAlphaDisabled
+Effect GuiHueShiftDisabled
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_GuiColorKeyAlpha"
+	PixelShader = "PS_GuiHueShift"
 	
 	Defines = { "DISABLED" }
 }
