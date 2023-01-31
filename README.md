@@ -71,17 +71,27 @@ The full list of usable `effectname` parameters are:
 #### Original Image 
 ![original](./assets/00_Original.png)
 
-#### Shader Effects
+#### Saturate
 
 ![saturate](./assets/00_saturate.png)
 
+#### Edges
+
 ![edges](./assets/00_edges.png)
 
-![cell shade](./assets/00_cellshade.png)
+#### Posterize
 
 ![posterize](./assets/00_posterize.png)
 
+#### Cell Shade
+
+![cell shade](./assets/00_cellshade.png)
+
+#### Dream
+
 ![dream](./assets/00_dream.png)
+
+#### Abberation
 
 ![abberation](./assets/00_abberation.png)
 
