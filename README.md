@@ -66,6 +66,14 @@ The full list of usable `effectname` parameters are:
 6. GuiKaleidoscope - Turns a texture into a Kaleidoscope
 7. GuiCameraFilm - Applies a camera film filter over the texture, makes it look like an old TV screen.
 
+## Animated Shaders
+
+There is a separate file named `GUI_animated.shader` that has several animated shader effects in it. Use it in the same way you would use the other effects, the shaders include:
+1. Stormy Night
+2. Cloud Cover
+3. Big Bang
+4. Star Field
+
 ## Screenshots
 
 #### Original Image 
