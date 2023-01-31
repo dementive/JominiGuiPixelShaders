@@ -119,7 +119,7 @@ widget = {
 			# Special Shader effects
 			#effectname = "GuiDreamView"
 			#effectname = "GuiChromaticAberration"
-			#effectname = "GuiAberration"
+			effectname = "GuiAberration"
 			#effectname = "GuiCameraFilm"
 			#effectname = "GuiHueShift"
 
@@ -129,9 +129,8 @@ widget = {
 			#effectname = "GuiKaleidoscope"
 
 			
-			position = { 0 0 }
 			texture = "gfx/loadingscreens/load_9.dds"
-			size = { 1500 1000 }
+			size = { 1600 1082 }
 		}
 		### ERROR PLATYPUS!
 		widget = {

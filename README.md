@@ -68,5 +68,22 @@ The full list of usable `effectname` parameters are:
 
 ## Screenshots
 
+#### Original Image 
+![original](./assets/00_Original.png)
 
-License - Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+#### Shader Effects
+
+![saturate](./assets/00_saturate.png)
+
+![edges](./assets/00_edges.png)
+
+![cell shade](./assets/00_cellshade.png)
+
+![posterize](./assets/00_posterize.png)
+
+![dream](./assets/00_dream.png)
+
+![abberation](./assets/00_abberation.png)
+
+## License
+Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.

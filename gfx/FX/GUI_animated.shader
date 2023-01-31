@@ -6,6 +6,7 @@ Includes = {
 	"cw/pdxgui_sprite.fxh"
 	"cw/utility.fxh"
 	"standardfuncsgfx.fxh"
+	"jomini/posteffect_base.fxh"
 }
 
 VertexShader =
@@ -315,7 +316,7 @@ PixelShader =
 
 				#define zoom   1.200
 				#define tile   0.850
-				#define speed  0.007
+				#define speed  0.01
 
 				#define brightness 0.0004
 				#define darkmatter 0.400
@@ -362,6 +363,87 @@ PixelShader =
 				}
 				v=lerp(vec3(length(v)),v,saturation); //color adjust
 				return float4(v*.01,1.0);
+			}
+		]]
+	}
+	MainCode PS_MountainsAtDawn
+	{	
+		Input = "VS_OUTPUT_PDX_GUI"
+		Output = "PDX_COLOR"
+		Code
+		[[
+			float2x2 rot(float a) {
+				return Create2x2(cos(a),sin(a),-sin(a),cos(a));
+			}
+
+			//Yonatan clouds/mountains combined field
+			float2 field(in float3 p) {
+
+				float s=2.0,e,f,o;
+			    float3 l = vec3(1.);
+			    
+			    for(e=f=p.y;s<8e2;s*=1.6)
+			    {
+			        p.xz = mul(rot(s), p.xy);
+			        e+=abs(dot(sin(p*s)/s,.4*l));
+			        f+=abs(dot(sin(p.xz*s*.5)/s,l.xz));
+			    }
+				o = 1.+ (f>.001?e:-exp(-f*f));
+			    return float2(max(o,0.),min(f,max(e,.07)));
+			}
+
+			float3 raycast( in float3 ro, float3 rd )
+			{
+			    float t = 2.5;
+			    float dt = .035;
+			    float3 col= vec3(0.);
+			    for( int i=0; i<100; i++ )
+				{
+			        float2 v = field(ro+t*rd);
+			        float c=v.x, f=v.y;
+			        t+=dt*f;
+			        dt *= 1.03;
+			        col = .95*col+ .09*float3(c*c*c, c*c, c);
+			    }
+
+			    return col;
+			}
+			PDX_MAIN
+			{
+				// https://www.shadertoy.com/view/fddSzl
+				float t = GlobalTime;
+			    float2 q = Input.UV0;
+			    q.y = 1 – q.y
+			    float2 p = q;
+			    float2 TextureSize;
+			    PdxTex2DSize( Texture, TextureSize );
+			    p.x *= TextureSize.x/TextureSize.y;
+
+			    // camera
+
+			    float3 ro = vec3(2.);
+
+			    ro.yz = mul(rot(-1.5), ro.yz);
+			    ro.y +=3.;
+			    ro.xz = mul(rot(0.1*t), ro.xz);
+
+			    float3 ta = float3( 0.0 , 0.0, 0.0 );
+			    float3 ww = normalize( ta - ro );
+			    float3 uu = normalize( cross(ww,float3(0.0,1.0,0.0) ) );
+			    float3 vv = normalize( cross(uu,ww));
+			    float3 rd = normalize( p.x*uu + p.y*vv + 4.0*ww );
+			    ro.x -=t*.4;
+
+				// raymarch
+
+			    float3 col = raycast(ro,rd);
+
+
+				// shade
+
+			    col =  .5 *(log(1.+col));
+			    col = clamp(col,0.,1.);
+			    return float4( col, 1.0 );
 			}
 		]]
 	}
@@ -483,6 +565,19 @@ Effect StarFieldDisabled
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_StarField"
+	
+	Defines = { "DISABLED" }
+}
+
+Effect MountainsAtDawn
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_MountainsAtDawn"
+}
+Effect MountainsAtDawnDisabled
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_MountainsAtDawn"
 	
 	Defines = { "DISABLED" }
 }

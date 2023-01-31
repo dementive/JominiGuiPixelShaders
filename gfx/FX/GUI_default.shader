@@ -202,7 +202,7 @@ PixelShader =
 				float xTrans = (Input.UV0.x*2)-1;
 				float yTrans = 1-(Input.UV0.y*2);
 				
-				float angle = atan2(yTrans/xTrans) + PI;
+				float angle = atan(yTrans/xTrans) + PI;
 
 				angle += (sign(xTrans) == 1) ? PI : 0.0;
 

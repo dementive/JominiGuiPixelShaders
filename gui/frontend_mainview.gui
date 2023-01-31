@@ -14,10 +14,11 @@ widget = {
 	
 	proportional_shader_icon = {
 		texture = "gfx/loadingscreens/load_9.dds"
-		effectname = "StormyNight"
+		#effectname = "StormyNight"
 		#effectname = "BigBang"
 		#effectname = "StarField"
-		#effectname = "CloudCover"
+		effectname = "CloudCover"
+		# effectname = "MountainsAtDawn" # This one doesn't work, raycasting is borked. Might fix it in future
 		size = { 100% 100% }
 	}
 
