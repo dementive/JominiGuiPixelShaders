@@ -1,3 +1,5 @@
+https://github.com/dinfinity/mpc-pixel-shaders
+
 The MIT License (MIT)
 
 Copyright (c) 2015 François L.A. Knoppel

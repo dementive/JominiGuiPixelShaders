@@ -1,0 +1,23 @@
+2D
+
+• Image Cel Shade - https://www.shadertoy.com/view/XlSSRW
+
+• Simple Luma Sharpen - https://www.shadertoy.com/view/4tcGW2
+
+• Chromatic Aberration - https://www.shadertoy.com/view/Mds3zn
+
+• Procedural film grain - https://www.shadertoy.com/view/4t2fRz
+
+• Bright Contrast Saturation Hue - starea @ ShaderToy - https://www.shadertoy.com/view/MdjBRy
+
+• oil paint brush - created by florian berger (flockaroo) - 2018 - https://www.shadertoy.com/view/MtKcDG
+
+Animated
+ 
+• Stormy night - https://www.shadertoy.com/view/XsX3DS
+
+• Galaxy of Universes - https://www.shadertoy.com/view/MdXSzS
+
+• Clouds-2D - https://www.shadertoy.com/view/WdXBW4
+
+• Star Nest by Pablo Roman Andrioli - https://www.shadertoy.com/view/XlfGRj

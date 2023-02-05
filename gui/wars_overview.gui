@@ -102,24 +102,25 @@ widget = {
 		shader_icon = {
 			enabled = yes
 			# Postprocessing effects (in order of usefullness)
-			#effectname = "GuiSaturate"
+			effectname = "GuiSaturate"
 			#effectname = "GuiVibrance"
 			#effectname = "GuiGloom"
 			#effectname = "GuiEdges"
 			#effectname = "GuiCrossProcessing"
-			#effectname = "GuiSharpen"
 			#effectname = "GuiCellShade"
 			#effectname = "GuiBloom"
 			#effectname = "GuiVignet"
+			#effectname = "GuiOilPainting"
 			#effectname = "GuiPosterize"
 			#effectname = "GuiEmboss"
 			#effectname = "GuiColorGrading"
+			#effectname = "GuiSharpen"
 			#effectname = "GuiPlasticWrap"
-
+			
 			# Special Shader effects
 			#effectname = "GuiDreamView"
 			#effectname = "GuiChromaticAberration"
-			effectname = "GuiAberration"
+			#effectname = "GuiAberration"
 			#effectname = "GuiCameraFilm"
 			#effectname = "GuiHueShift"
 
@@ -129,7 +130,7 @@ widget = {
 			#effectname = "GuiKaleidoscope"
 
 			
-			texture = "gfx/loadingscreens/load_9.dds"
+			texture = "gfx/loadingscreens/load_4.dds"
 			size = { 1600 1082 }
 		}
 		### ERROR PLATYPUS!

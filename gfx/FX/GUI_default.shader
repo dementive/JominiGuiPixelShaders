@@ -5,7 +5,10 @@ Includes = {
 	"cw/pdxgui.fxh"
 	"cw/pdxgui_sprite.fxh"
 	"cw/utility.fxh"
-	"standardfuncsgfx.fxh"
+	"standardfuncsgfx.fxh" 
+	# standardfuncsgfx.fxh imported for GlobalTime
+	# If using in Victoria 3 change to "sharedconstants.fxh"
+	# If using in CK3 or Imperator keep "standardfuncsgfx.fxh"
 }
 
 VertexShader =
@@ -119,13 +122,13 @@ PixelShader =
 			    for(int i = -1; i <= 1; ++i) {
 			        for(int j = -1; j <= 1; ++j) {
 			            float2 offset = float2(i,j) / size;
-			            float s = extractLuma(PdxTex2D(Texture,Input.UV0 + offset).rgb);
+			            float s = extractLuma(SampleImageSprite(Texture,Input.UV0 + offset).rgb);
 			            float notCentre = min(float(i*i + j*j),1.0);
 			            accumY += s * (9.0 - notCentre*10.0);
 			        }
 			    }
 			    
-			    accumY /= 11.0;
+			    accumY /= 22.0;
 			    accumY = (accumY + yuv.x)*0.9;
 			    
 				OutColor = float4(mul(RGBFromYUV, float3(accumY,yuv.y,yuv.z)),OutColor.a);
@@ -168,9 +171,9 @@ PixelShader =
 				amount *= ABBERATION_INTENSITY;
 
 			    float3 col;
-			    col.r = PdxTex2D( Texture, float2(Input.UV0.x+amount,Input.UV0.y) ).r;
-			    col.g = PdxTex2D( Texture, Input.UV0 ).g;
-			    col.b = PdxTex2D( Texture, float2(Input.UV0.x-amount,Input.UV0.y) ).b;
+			    col.r = SampleImageSprite( Texture, float2(Input.UV0.x+amount,Input.UV0.y) ).r;
+			    col.g = SampleImageSprite( Texture, Input.UV0 ).g;
+			    col.b = SampleImageSprite( Texture, float2(Input.UV0.x-amount,Input.UV0.y) ).b;
 
 				col *= (1.0 - amount * 0.5);
 				
@@ -219,9 +222,9 @@ PixelShader =
 				bC.x = (radii[2] * cos(angle)+1.0)/2.0;
 				bC.y = -1* ((radii[2] * sin(angle)-1.0)/2.0);
 
-				float4 rA = PdxTex2D(Texture, rC);
-				float4 gA = PdxTex2D(Texture, gC);
-				float4 bA = PdxTex2D(Texture, bC);
+				float4 rA = SampleImageSprite(Texture, rC);
+				float4 gA = SampleImageSprite(Texture, gC);
+				float4 bA = SampleImageSprite(Texture, bC);
 
 				float4 result = float4(rA[0], gA[1], bA[2], 1.0);
 				OutColor = float4(result.rgb, OutColor.a);
@@ -263,10 +266,7 @@ PixelShader =
 				// LerpFactor *= pow( sin( GlobalTime ) * 0.5f + 0.5f, 3.5 ) * 0.5f;
 				// ampFactor = lerp( ampFactor, LerpY, LerpFactor );
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
-				float4 origColor = PdxTex2D(Texture, Input.UV0);
 				float4 accumulatedColor = {0,0,0,0};	
-
 				for (int radiusStep = 0; radiusStep < radiusSteps; radiusStep++) {
 					float radius = minRadius + radiusStep * radiusDelta;
 
@@ -275,16 +275,16 @@ PixelShader =
 						float yDiff = radius * sin(angle);
 						
 						float2 currentCoord = Input.UV0 + float2(xDiff, yDiff);
-						float4 currentColor = PdxTex2D(Texture, currentCoord);
-						float4 colorDiff = abs(c0 - currentColor) ;
+						float4 currentColor = SampleImageSprite(Texture, currentCoord);
+						float4 colorDiff = abs(OutColor - currentColor) ;
 						float currentFraction = ((float)(radiusSteps+1 - radiusStep)) / (radiusSteps+1);
 						accumulatedColor +=  currentFraction * colorDiff / totalSteps * sign(angle  -  PI);
 					}
 				}
 				accumulatedColor *= ampFactor;
 
-				//OutColor = c0+accumulatedColor; // down
-				OutColor = c0-accumulatedColor; // up
+				//OutColor = OutColor+accumulatedColor; // down
+				OutColor = OutColor-accumulatedColor; // up
 
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
@@ -413,8 +413,6 @@ PixelShader =
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
-
 				float xTrans = (Input.UV0.x*2)-1;
 				float yTrans = 1-(Input.UV0.y*2);
 				
@@ -427,9 +425,7 @@ PixelShader =
 				float maxRadius = pow(radius,13)*1.0/Input.UV0.x;
 				float ampFactor = 1.5;
 
-				float4 origColor = PdxTex2D(Texture, Input.UV0);
 				float4 accumulatedColor = float4(0.0,0.0,0.0,0.0);
-
 				int totalSteps = radiusSteps * angleSteps;
 				float angleDelta = (2 * PI) / angleSteps;
 				float radiusDelta = (maxRadius - minRadius) / radiusSteps;
@@ -444,7 +440,7 @@ PixelShader =
 						float yDiff = radius * sin(angle);
 						
 						currentCoord = Input.UV0 + float2(xDiff, yDiff);
-						float4 currentColor = PdxTex2D(Texture, currentCoord);
+						float4 currentColor = SampleImageSprite(Texture, currentCoord);
 						float currentFraction = ((float)(radiusSteps+1 - radiusStep)) / (radiusSteps+1);
 
 						accumulatedColor +=   currentFraction * currentColor / totalSteps;
@@ -476,10 +472,9 @@ PixelShader =
 				static const float SAT_FACTOR = 2.0;
 				static const float SAT_CORRECTION = 0.9;
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
-				float luminance = (c0.r+c0.g+c0.b)/3;
+				float luminance = (OutColor.r+OutColor.g+OutColor.b)/3;
 				//Saturate
-				float4 result = c0 * SAT_FACTOR + (1-SAT_FACTOR)*luminance;
+				float4 result = OutColor * SAT_FACTOR + (1-SAT_FACTOR)*luminance;
 				OutColor = float4(result.rgb, OutColor.a);
 				OutColor.rgb *= SAT_CORRECTION;
 
@@ -522,9 +517,9 @@ PixelShader =
 				sourceTwoLocation.x = sourceTwoLocation.x - clockSine / 4.0 + clockSine2 / 4.0 - (clockSine / 2.0) +(clockSine2/2);
 				sourceTwoLocation.y = sourceTwoLocation.y - clockSine / 4.0 - clockSine2 / 4.0 - (clockSine / 2.0) +(clockSine2/2);
 
-				float4 sourceColor = PdxTex2D(Texture, sourceLocation);
-				float4 sourceTwoColor = PdxTex2D(Texture, sourceTwoLocation);
-				float4 originalColor = PdxTex2D(Texture, originalLocation);
+				float4 sourceColor = SampleImageSprite(Texture, sourceLocation);
+				float4 sourceTwoColor = SampleImageSprite(Texture, sourceTwoLocation);
+				float4 originalColor = SampleImageSprite(Texture, originalLocation);
 				float4 result = float4(sourceTwoColor.r, sourceColor.g, originalColor.b, 1.0);
 				OutColor = float4(result.rgb, OutColor.a);
 
@@ -603,7 +598,7 @@ PixelShader =
 				float opacity = 0.8;
 				float correction = 0.2;
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
+				float4 c0 = SampleImageSprite(Texture, Input.UV0);
 				float verticalDim = 0.5 + sin (Input.UV0.y*PI)*0.9 ;
 				
 				float xTrans = (Input.UV0.x*2)-1;
@@ -644,7 +639,7 @@ PixelShader =
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
 			
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
+				float4 c0 = SampleImageSprite(Texture, Input.UV0);
 
 				float factor[3];
 				factor[0] = 0.11;
@@ -710,9 +705,9 @@ PixelShader =
 				for (int i = 0; i < 12; i++)
 				{
 				   float2 Coord = NewUV + (poisson[i] / 1000.0);
-				   Color += PdxTex2D(Texture, Coord) / 17.0;
+				   Color += SampleImageSprite(Texture, Coord) / 17.0;
 				}
-				Color += PdxTex2D(Texture, Input.UV0) / 40;
+				Color += SampleImageSprite(Texture, Input.UV0) / 40;
 				OutColor = float4(Color.rgb, OutColor.a);
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
@@ -742,7 +737,7 @@ PixelShader =
 
 				float xTrans = (Input.UV0.x*2)-1;
 				float yTrans = 1-(Input.UV0.y*2);
-				float angle = atan2(yTrans/xTrans)+ (PI/2);
+				float angle = atan(yTrans/xTrans)+ (PI/2);
 				angle += (sign(xTrans) == -1) ? PI : 0.0;
 				float radius = sqrt(pow(xTrans,2) + pow(yTrans,2));	
 				float angleDegrees = degrees(angle);
@@ -762,7 +757,7 @@ PixelShader =
 			    newCoord.x = (1.0 + newCoord.x) / 2;
 			    newCoord.y = (1.0 - newCoord.y) / 2;
 
-			    float4 res  = PdxTex2D(Texture, newCoord);
+			    float4 res  = SampleImageSprite(Texture, newCoord);
 				OutColor = float4(res.rgb, OutColor.a);
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
@@ -797,9 +792,7 @@ PixelShader =
 				float angleOffset = PI * 2;
 				//angleOffset *= GlobalTime / 20;
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
 				float4 accumulatedColor = float4(0,0,0,0);
-
 				for (int radiusStep = 0; radiusStep < radiusSteps; radiusStep++) {
 					float radius = minRadius + radiusStep * radiusDelta;
 
@@ -812,8 +805,8 @@ PixelShader =
 						float yDiff = radius * sin(modAngle);
 						
 						currentCoord = Input.UV0 + float2(xDiff, yDiff);
-						float4 currentColor = PdxTex2D(Texture, currentCoord);
-						float4 colorDiff = abs(c0 - currentColor);
+						float4 currentColor = SampleImageSprite(Texture, currentCoord);
+						float4 colorDiff = abs(OutColor - currentColor);
 						float currentFraction = ((float)(radiusSteps+1 - radiusStep)) / (radiusSteps+1);
 						accumulatedColor +=  currentFraction * colorDiff / totalSteps;
 						
@@ -821,9 +814,9 @@ PixelShader =
 				}
 				accumulatedColor *= ampFactor;
 				//float4 res = accumulatedColor; // Traditional edge style;
-				//float4 res = 0.85*c0+accumulatedColor; // Smoother style;
-				//float4 res = c0+accumulatedColor; // Angel style;
-				float4 res = 1.25*c0-accumulatedColor; // Cell shaded style
+				//float4 res = 0.85*OutColor+accumulatedColor; // Smoother style;
+				//float4 res = OutColor+accumulatedColor; // Angel style;
+				float4 res = 1.25*OutColor-accumulatedColor; // Cell shaded style
 
 				OutColor = float4(res.rgb, OutColor.a);
 				#ifdef DISABLED
@@ -849,7 +842,7 @@ PixelShader =
 				#define radiusSteps 21
 				#define totalSteps (radiusSteps * angleSteps)
 
-				#define ampFactor 1.5
+				#define ampFactor 1.1
 				#define minRadius (3/Input.Position.x)
 				#define maxRadius (24/Input.Position.x)
 
@@ -866,7 +859,7 @@ PixelShader =
 						float yDiff = radius * sin(angle);
 						
 						currentCoord = Input.UV0 + float2(xDiff, yDiff);
-						float4 currentColor = PdxTex2D(Texture, currentCoord);
+						float4 currentColor = SampleImageSprite(Texture, currentCoord);
 						float4 colorDiff = abs(OutColor - currentColor);
 						float currentFraction = ((float)(radiusSteps+1 - radiusStep)) / (radiusSteps+1);
 						accumulatedColor +=  currentFraction * colorDiff / totalSteps;
@@ -902,10 +895,7 @@ PixelShader =
 				#define ampFactor 1.3
 				float correction = 0.6;
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
-				float4 origColor = PdxTex2D(Texture, Input.UV0);
 				float4 accumulatedColor = float4(0,0,0,0);
-
 				int totalSteps = radiusSteps * angleSteps;
 				float angleDelta = (2 * PI) / angleSteps;
 				float radiusDelta = (maxRadius - minRadius) / radiusSteps;
@@ -920,14 +910,14 @@ PixelShader =
 						float yDiff = radius * sin(angle);
 						
 						currentCoord = Input.UV0 + float2(xDiff, yDiff);
-						float4 currentColor = PdxTex2D(Texture, currentCoord);
+						float4 currentColor = SampleImageSprite(Texture, currentCoord);
 						float currentFraction = ((float)(radiusSteps+1 - radiusStep)) / (radiusSteps+1);
 
 						accumulatedColor +=   currentFraction * currentColor / totalSteps;
 					}
 				}
 
-				float4 outputPixel = PdxTex2D(Texture, Input.UV0);
+				float4 outputPixel = SampleImageSprite(Texture, Input.UV0);
 				outputPixel += accumulatedColor * ampFactor;
 				outputPixel *= correction;
 				OutColor = float4(outputPixel.rgb, OutColor.a);
@@ -960,7 +950,7 @@ PixelShader =
 				float BaseSaturation = 1.0;
 				float threshold = 0.25f;
 
-				float4 base = 1.0 - PdxTex2D(Texture, Input.UV0);
+				float4 base = 1.0 - OutColor;
 				float4 gloom = saturate((base - threshold) / (1 - threshold));
 				
 				gloom = AdjustSaturation(gloom, GloomSaturation) * GloomIntensity;
@@ -1001,7 +991,7 @@ PixelShader =
 				#define radiusDelta ((maxRadius - minRadius) / radiusSteps)
 				float correction = 0.7;
 
-				float4 c0 = PdxTex2D(Texture, Input.UV0);
+				float4 c0 = SampleImageSprite(Texture, Input.UV0);
 				float4 accumulatedColor = float4(0,0,0,0);	
 
 				for (int radiusStep = 1; radiusStep <= radiusSteps; radiusStep++) {
@@ -1014,7 +1004,7 @@ PixelShader =
 						float yDiff = radius * sin(angle);
 						
 						currentCoord = Input.UV0 + float2(xDiff, yDiff);
-						float4 currentColor = PdxTex2D(Texture, currentCoord);
+						float4 currentColor = SampleImageSprite(Texture, currentCoord);
 						float4 colorDiff = c0 - currentColor;
 
 						accumulatedColor += ((radiusSteps+1 - radiusStep) /radiusSteps) * colorDiff / totalSteps;
@@ -1050,6 +1040,7 @@ PixelShader =
 			}
 			PDX_MAIN
 			{
+				// https://www.shadertoy.com/view/MdjBRy
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
 				OutColor *= Input.Color;
 
@@ -1057,6 +1048,59 @@ PixelShader =
 				float4 color = shiftHue(OutColor.rgb, hue);
 				OutColor = float4(color.rgb, OutColor.a);
 
+				#ifdef DISABLED
+					OutColor.rgb = DisableColor( OutColor.rgb );
+				#endif
+				
+			    return OutColor;
+			}
+		]]
+	}
+	MainCode PS_GuiOilPainting
+	{	
+		Input = "VS_OUTPUT_PDX_GUI"
+		Output = "PDX_COLOR"
+		Code
+		[[
+
+			float getVal(float2 uv, float2 Res)
+			{
+				return length(PdxTex2DLod(Texture,uv,.5+.5*log2(Res.x/1920.)).xyz);
+			}
+				
+			float2 getGrad(float2 uv,float delta, float2 res)
+			{
+				float2 d=float2(delta,0);
+				return float2(
+					getVal(uv+d.xy, res)-getVal(uv-d.xy, res),
+					getVal(uv+d.yx, res)-getVal(uv-d.yx, res)
+				)/delta;
+			}
+			PDX_MAIN
+			{
+				// https://www.shadertoy.com/view/MtKcDG
+				#define Res Input.Position.xy
+				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
+				
+				float4 fragColor;
+				float PaintSpec = .20;
+				float offset = 0.75;
+
+				float2 uv = Input.UV0;
+				float3 n = float3(getGrad(uv,1.0/Input.Position.y, Input.Position.xy),600.0);
+
+				n=normalize(n);
+				fragColor=float4(n,1);
+				float3 light = normalize(float3(-1,1,1.4));
+				float diff=clamp(dot(n,light),0.,1.0);
+				float spec=clamp(dot(reflect(light,n),float3(0,0,-1)),0.0,1.0);
+				spec=pow(spec,25.0)*PaintSpec;
+				float sh=clamp(dot(reflect(light*float3(-1,-1,1),n),float3(0,0,-1)),0.0,1.0);
+				sh=pow(sh,4.0)*.1;
+				fragColor = SampleImageSprite(Texture,uv)*lerp(diff,1.,offset)+spec*float4(.85,1.,1.15,1.)+sh*float4(.85,1.,1.15,1.);
+				fragColor.w=1.;
+
+				OutColor = float4(fragColor.rgb, OutColor.a);
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
@@ -1411,6 +1455,19 @@ Effect GuiHueShiftDisabled
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiHueShift"
+	
+	Defines = { "DISABLED" }
+}
+
+Effect GuiOilPainting
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiOilPainting"
+}
+Effect GuiOilPaintingDisabled
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiOilPainting"
 	
 	Defines = { "DISABLED" }
 }
