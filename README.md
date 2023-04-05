@@ -4,7 +4,7 @@ A collection of 20+ Pixel shaders meant to be used on GUI elements for Jomini ba
 
 # How to Use
 
-The only files from this repo you will need to put in your mod are `gfx/FX/GUI_default.shader` and `gfx/FX/GUI_animated.shader`
+The only files from this repo you will need to put in your mod are `gfx/FX/GUI_default.shader`, `gfx/FX/GUI_pushbutton.shader`and `gfx/FX/GUI_animated.shader`
 
 First you'll need to make a special gui type that uses the new pixel shader like this:
 ```
@@ -39,7 +39,7 @@ icon = {
 
 Note that if you are using these on Victoria 3 you'll have to go into both the shader files and replace one of the fxh includes so `GlobalTime` can be included correctly.
 
-These shaders can be used on any gui widget that normally use the `shaderfile = "pdxgui_default.shader"`. However they can be applied to any shader but the pixel shader code and shader effects will need to be updated with that specific shaders vanilla code, which is very easy to do. If you need the effects for another shader (`pdxgui_pushbutton.shader for example`) open up an issue and i'll get to it eventually or do it yourself and put up a pull request.
+These shaders can be used on any gui widget that normally use the `shaderfile = "pdxgui_default.shader"`. However they can be applied to any shader but the pixel shader code and shader effects will need to be updated with that specific shaders vanilla code, which is very easy to do. If you need the effects for another shader (`pdxgui_texticon.shader for example`) open up an issue and i'll get to it eventually or do it yourself and put up a pull request.
 
 The full list of usable `effectname` parameters are:
 

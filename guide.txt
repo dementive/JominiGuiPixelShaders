@@ -1,0 +1,7 @@
+-- Guide to Converting Shadertoy to HLSL --
+
+https://alastaira.wordpress.com/2015/08/07/unity-shadertoys-a-k-a-converting-glsl-shaders-to-cghlsl/
+
+• iResolution.x = Input.Position.x
+• iResolution.y = Input.Position.y
+• fragCoord = Input.UV0

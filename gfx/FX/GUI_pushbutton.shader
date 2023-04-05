@@ -1,5 +1,5 @@
-# pdxgui_default.shader with a bunch of different effects
-# Use effectname = "x" in the gui to use a different pixel shader for different gui widgets
+# pdxgui_pushbutton.shader with a bunch of different effects
+# Use effectname = "x" in the gui to use a different pixel shader for different gui buttons
 
 Includes = {
 	"cw/pdxgui.fxh"
@@ -10,6 +10,11 @@ Includes = {
 	# If using in Victoria 3 change to "sharedconstants.fxh"
 	# If using in CK3 or Imperator keep "standardfuncsgfx.fxh"
 }
+
+ConstantBuffer( PdxConstantBuffer2 )
+{
+	float3 HighlightColor;
+};
 
 VertexShader =
 {
@@ -38,21 +43,24 @@ PixelShader =
 		SampleModeU = "Clamp"
 		SampleModeV = "Clamp"
 	}
-	MainCode PS_Default
-	{	
+	MainCode PixelShader
+	{
 		Input = "VS_OUTPUT_PDX_GUI"
 		Output = "PDX_COLOR"
 		Code
 		[[
 			PDX_MAIN
-			{
+			{			
 				float4 OutColor = SampleImageSprite( Texture, Input.UV0 );
+
 				OutColor *= Input.Color;
+				#ifndef NO_HIGHLIGHT
+					OutColor.rgb += HighlightColor;
+				#endif
 				
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
 			    return OutColor;
 			}
 		]]
@@ -82,7 +90,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-
+				OutColor.rgb += HighlightColor;
 				return OutColor;
 			}
 		]]
@@ -135,7 +143,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-
+				OutColor.rgb += HighlightColor;
 				return OutColor;
 			}
 		]]
@@ -182,7 +190,7 @@ PixelShader =
 			    #ifdef DISABLED
 			    	OutColor.rgb = DisableColor( OutColor.rgb );
 			    #endif
-
+			    OutColor.rgb += HighlightColor;
 				return OutColor;
 			}
 		]]
@@ -231,7 +239,7 @@ PixelShader =
 			    #ifdef DISABLED
 			    	OutColor.rgb = DisableColor( OutColor.rgb );
 			    #endif
-
+			    OutColor.rgb += HighlightColor;
 				return OutColor;
 			}
 		]]
@@ -289,7 +297,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -349,7 +357,7 @@ PixelShader =
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
 
-
+				OutColor.rgb += HighlightColor;
 				return OutColor;
 			}
 		]]
@@ -396,7 +404,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -453,7 +461,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -481,7 +489,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -526,7 +534,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -576,7 +584,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -622,7 +630,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -666,7 +674,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -712,7 +720,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -762,6 +770,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -822,6 +831,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -872,6 +882,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -924,6 +935,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -962,7 +974,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -1020,6 +1032,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -1051,7 +1064,7 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
@@ -1104,12 +1117,13 @@ PixelShader =
 				#ifdef DISABLED
 					OutColor.rgb = DisableColor( OutColor.rgb );
 				#endif
-				
+				OutColor.rgb += HighlightColor;
 			    return OutColor;
 			}
 		]]
 	}
 }
+
 
 BlendState BlendState
 {
@@ -1123,67 +1137,151 @@ BlendState BlendStateNoAlpha
 	BlendEnable = no
 }
 
-BlendState PreMultipliedAlpha
-{
-	BlendEnable = yes
-	SourceBlend = "ONE"
-	DestBlend = "INV_SRC_ALPHA"
-}
-
 DepthStencilState DepthStencilState
 {
 	DepthEnable = no
 }
 
 
-Effect PdxGuiDefault
+Effect Up
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_Default"
+	PixelShader = "PixelShader"
 }
-Effect PdxGuiDefaultDisabled
+
+Effect Over
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_Default"
+	PixelShader = "PixelShader"
+}
+
+Effect Down
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+}
+
+Effect Disabled
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
 	
 	Defines = { "DISABLED" }
 }
 
-Effect PdxGuiDefaultNoAlpha
+Effect NoAlphaNoHighlightUp
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_Default"
+	PixelShader = "PixelShader"
 	BlendState = BlendStateNoAlpha
+
+	Defines = { "NO_HIGHLIGHT" }
 }
-Effect PdxGuiDefaultNoAlphaDisabled
+
+Effect NoAlphaNoHighlightOver
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_Default"
+	PixelShader = "PixelShader"
 	BlendState = BlendStateNoAlpha
 	
-	Defines = { "DISABLED" }
+	Defines = { "NO_HIGHLIGHT" }
 }
 
-Effect PdxGuiPreMultipliedAlpha
+Effect NoAlphaNoHighlightDown
 {
 	VertexShader = "VS_Default"
-	PixelShader = "PS_Default"
-	BlendState = PreMultipliedAlpha
-}
-Effect PdxGuiPreMultipliedAlphaDisabled
-{
-	VertexShader = "VS_Default"
-	PixelShader = "PS_Default"
-	BlendState = PreMultipliedAlpha
+	PixelShader = "PixelShader"
+	BlendState = BlendStateNoAlpha
 	
+	Defines = { "NO_HIGHLIGHT" }
+}
+
+Effect NoAlphaNoHighlightDisabled
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	BlendState = BlendStateNoAlpha
+	
+	Defines = { "DISABLED" "NO_HIGHLIGHT" }
+}
+
+Effect NoHighlightUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	
+	Defines = { "NO_HIGHLIGHT" }
+}
+
+Effect NoHighlightOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	
+	Defines = { "NO_HIGHLIGHT" }
+}
+
+Effect NoHighlightDown
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	
+	Defines = { "NO_HIGHLIGHT" }
+}
+
+Effect NoHighlightDisabled
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	
+	Defines = { "DISABLED" "NO_HIGHLIGHT" }
+}
+
+Effect GreyedOutUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
 	Defines = { "DISABLED" }
 }
 
-Effect GuiPosterize
+Effect GreyedOutOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	Defines = { "DISABLED" }
+}
+
+Effect GreyedOutDown
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	Defines = { "DISABLED" }
+}
+
+Effect GreyedOutDisabled
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PixelShader"
+	
+	Defines = { "DISABLED" "NO_HIGHLIGHT" }
+}
+
+Effect GuiPosterizeUp
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiPosterize"
 }
+Effect GuiPosterizeOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiPosterize"
+}
+Effect GuiPosterizeDown
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiPosterize"
+}
+
 Effect GuiPosterizeDisabled
 {
 	VertexShader = "VS_Default"
@@ -1192,7 +1290,17 @@ Effect GuiPosterizeDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiSharpen
+Effect GuiSharpenUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiSharpen"
+}
+Effect GuiSharpenOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiSharpen"
+}
+Effect GuiSharpenDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiSharpen"
@@ -1205,7 +1313,17 @@ Effect GuiSharpenDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiChromaticAberration
+Effect GuiChromaticAberrationUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiChromaticAberration"
+}
+Effect GuiChromaticAberrationOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiChromaticAberration"
+}
+Effect GuiChromaticAberrationDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiChromaticAberration"
@@ -1218,7 +1336,17 @@ Effect GuiChromaticAberrationDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiCameraFilm
+Effect GuiCameraFilmUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiCameraFilm"
+}
+Effect GuiCameraFilmOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiCameraFilm"
+}
+Effect GuiCameraFilmDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiCameraFilm"
@@ -1231,7 +1359,17 @@ Effect GuiCameraFilmDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiAberration
+Effect GuiAberrationUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiAberration"
+}
+Effect GuiAberrationOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiAberration"
+}
+Effect GuiAberrationDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiAberration"
@@ -1244,7 +1382,17 @@ Effect GuiAberrationDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiEmboss
+Effect GuiEmbossUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiEmboss"
+}
+Effect GuiEmbossOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiEmboss"
+}
+Effect GuiEmbossDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiEmboss"
@@ -1257,7 +1405,17 @@ Effect GuiEmbossDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiColorGrading
+Effect GuiColorGradingUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiColorGrading"
+}
+Effect GuiColorGradingOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiColorGrading"
+}
+Effect GuiColorGradingDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiColorGrading"
@@ -1270,7 +1428,17 @@ Effect GuiColorGradingDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiDreamView
+Effect GuiDreamViewUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiDreamView"
+}
+Effect GuiDreamViewOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiDreamView"
+}
+Effect GuiDreamViewDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiDreamView"
@@ -1283,7 +1451,17 @@ Effect GuiDreamViewDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiSaturate
+Effect GuiSaturateUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiSaturate"
+}
+Effect GuiSaturateOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiSaturate"
+}
+Effect GuiSaturateDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiSaturate"
@@ -1296,7 +1474,17 @@ Effect GuiSaturateDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiShakyColor
+Effect GuiShakyColorUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiShakyColor"
+}
+Effect GuiShakyColorOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiShakyColor"
+}
+Effect GuiShakyColorDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiShakyColor"
@@ -1309,7 +1497,17 @@ Effect GuiShakyColorDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiVibrance
+Effect GuiVibranceUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiVibrance"
+}
+Effect GuiVibranceOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiVibrance"
+}
+Effect GuiVibranceDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiVibrance"
@@ -1323,7 +1521,17 @@ Effect GuiVibranceDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiVignet
+Effect GuiVignetUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiVignet"
+}
+Effect GuiVignetOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiVignet"
+}
+Effect GuiVignetDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiVignet"
@@ -1336,7 +1544,17 @@ Effect GuiVignetDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiCrossProcessing
+Effect GuiCrossProcessingUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiCrossProcessing"
+}
+Effect GuiCrossProcessingOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiCrossProcessing"
+}
+Effect GuiCrossProcessingDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiCrossProcessing"
@@ -1349,7 +1567,17 @@ Effect GuiCrossProcessingDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiUnderwaterBlur
+Effect GuiUnderwaterBlurUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiUnderwaterBlur"
+}
+Effect GuiUnderwaterBlurOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiUnderwaterBlur"
+}
+Effect GuiUnderwaterBlurDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiUnderwaterBlur"
@@ -1362,7 +1590,17 @@ Effect GuiUnderwaterBlurDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiKaleidoscope
+Effect GuiKaleidoscopeUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiKaleidoscope"
+}
+Effect GuiKaleidoscopeOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiKaleidoscope"
+}
+Effect GuiKaleidoscopeDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiKaleidoscope"
@@ -1375,7 +1613,17 @@ Effect GuiKaleidoscopeDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiEdges
+Effect GuiEdgesUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiEdges"
+}
+Effect GuiEdgesOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiEdges"
+}
+Effect GuiEdgesDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiEdges"
@@ -1388,7 +1636,17 @@ Effect GuiEdgesDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiCellShade
+Effect GuiCellShadeUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiCellShade"
+}
+Effect GuiCellShadeOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiCellShade"
+}
+Effect GuiCellShadeDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiCellShade"
@@ -1401,7 +1659,17 @@ Effect GuiCellShadeDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiBloom
+Effect GuiBloomUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiBloom"
+}
+Effect GuiBloomOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiBloom"
+}
+Effect GuiBloomDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiBloom"
@@ -1414,7 +1682,17 @@ Effect GuiBloomDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiGloom
+Effect GuiGloomUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiGloom"
+}
+Effect GuiGloomOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiGloom"
+}
+Effect GuiGloomDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiGloom"
@@ -1427,7 +1705,17 @@ Effect GuiGloomDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiPlasticWrap
+Effect GuiPlasticWrapUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiPlasticWrap"
+}
+Effect GuiPlasticWrapOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiPlasticWrap"
+}
+Effect GuiPlasticWrapDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiPlasticWrap"
@@ -1440,7 +1728,17 @@ Effect GuiPlasticWrapDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiHueShift
+Effect GuiHueShiftUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiHueShift"
+}
+Effect GuiHueShiftOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiHueShift"
+}
+Effect GuiHueShiftDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiHueShift"
@@ -1453,7 +1751,17 @@ Effect GuiHueShiftDisabled
 	Defines = { "DISABLED" }
 }
 
-Effect GuiOilPainting
+Effect GuiOilPaintingUp
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiOilPainting"
+}
+Effect GuiOilPaintingOver
+{
+	VertexShader = "VS_Default"
+	PixelShader = "PS_GuiOilPainting"
+}
+Effect GuiOilPaintingDown
 {
 	VertexShader = "VS_Default"
 	PixelShader = "PS_GuiOilPainting"
